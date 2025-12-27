@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignUp | Premium Experience</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
+    <style>
+:root {
+    --primary: #667eea;
+    --secondary: #764ba2;
+    --glass-bg: rgba(255, 255, 255, 0.12);
+    --glass-border: rgba(255, 255, 255, 0.25);
+    --text-light: #f5f5f5;
+}
+
+body {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    font-family: 'Poppins', system-ui, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ===== Card (Glassmorphism) ===== */
+.luxury-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    border-radius: 25px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    animation: fadeUp 1s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Heading ===== */
+h1, .h1 {
+    background: linear-gradient(135deg, #fff, #dcdcff);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ===== Inputs ===== */
+.form-control {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid transparent;
+    color: var(--text-light);
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.35s ease;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.45);
+    transform: scale(1.02);
+    color: #fff;
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ===== Icons ===== */
+.fas {
+    color: #ffffff;
+    opacity: 0.85;
+    transition: transform 0.3s ease;
+}
+
+.form-outline:focus-within .fas {
+    transform: scale(1.15);
+}
+
+/* ===== Button ===== */
+.btn-primary {
+    background: linear-gradient(135deg, #ffffff, #e0e0ff);
+    border: none;
+    color: #333;
+    font-weight: 600;
+    padding: 12px 45px;
+    border-radius: 30px;
+    transition: all 0.4s ease;
+    animation: pulse 2s infinite;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 255, 255, 0.45);
+    color: #000;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.6); }
+    70% { box-shadow: 0 0 0 18px rgba(255,255,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+
+/* ===== Alert ===== */
+.alert-danger {
+    background: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    color: #ffd1d1;
+    border-radius: 12px;
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+/* ===== Links ===== */
+a {
+    color: #ffffff;
+    font-weight: 500;
+    text-decoration: none;
+    position: relative;
+}
+
+a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 0;
+    height: 2px;
+    background: #ffffff;
+    transition: width 0.3s ease;
+}
+
+a:hover::after {
+    width: 100%;
+}
+
+/* ===== Image ===== */
+.img-fluid {
+    border-radius: 18px;
+    animation: fadeIn 1.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===== Floating Glow ===== */
+.floating-element {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 70%);
+    border-radius: 50%;
+    animation: float 18s infinite linear;
+    z-index: -1;
+}
+
+@keyframes float {
+    from { transform: translate(0,0); }
+    to { transform: translate(120px,120px); }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 992px) {
+    .img-fluid { margin-top: 30px; }
+}
+</style>
+
+</head>
+
+<body>
+    <!-- Animated background elements -->
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+
+    <section class="vh-100 d-flex align-items-center">
+        <div class="container h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-lg-12 col-xl-11">
+                    <div class="luxury-card animate__animated animate__fadeIn">
+                        <div class="card-body p-md-5 p-4">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+
+                                    <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4 animate__animated animate__fadeInDown">Sign up</p>
+                                    
+                                    {% if invalid %}
+                                    <div class="alert alert-danger animate__animated animate__shakeX" role="alert">
+                                        <i class="fas fa-exclamation-circle me-2"></i>{{ invalid }}
+                                    </div>
+                                    {% endif %}
+
+                                    <form class="mx-1 mx-md-4" method="post" id="signupForm">
+                                        {% csrf_token %}
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                <input type="text" id="form3Example1c" name="fnm" required
+                                                    class="form-control animate__animated" />
+                                                <label class="form-label" for="form3Example1c">Your Name</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                <input type="email" id="form3Example3c" name="emailid" required
+                                                    class="form-control animate__animated" />
+                                                <label class="form-label" for="form3Example3c">Your Email</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex flex-row align-items-center mb-4">
+                                            <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                            <div class="form-outline flex-fill mb-0">
+                                                <input type="password" id="form3Example4c" name="pwd" required
+                                                    class="form-control animate__animated" />
+                                                <label class="form-label" for="form3Example4c">Password</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-check d-flex justify-content-center mb-5">
+                                            <label class="form-check-label" for="form2Example3">
+                                                Already have an account? <a href="/login" class="fw-bold">Login</a>
+                                            </label>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">Register</button>
+                                        </div>
+
+                                    </form>
+
+                                </div>
+                                <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+
+                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
+                                        class="img-fluid animate__animated animate__fadeInRight" alt="Sample image">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+    
+    <script>
+        // Add animation to form inputs on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach((input, index) => {
+                input.classList.add('animate__animated', 'animate__fadeInUp');
+                input.style.animationDelay = `${index * 0.1}s`;
+            });
+            
+            // Form submission animation
+            const form = document.getElementById('signupForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (form) {
+                form.addEventListener('submit', function() {
+                    submitBtn.classList.add('btn-loading');
+                    submitBtn.innerHTML = '';
+                });
+            }
+            
+            // Add floating particles for visual effect
+            createParticles();
+        });
+        
+        function createParticles() {
+            const particlesContainer = document.querySelector('body');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                
+                // Random animation
+                const duration = 3 + Math.random() * 5;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s infinite ${delay}s linear`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+    </script>
+</body>
+
+</html>
