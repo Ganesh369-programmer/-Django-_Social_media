@@ -1,137 +1,1370 @@
+{% extends "layout.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% block title %}Social Media Feed{% endblock title %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+{% block style %}
+/* ===== RESPONSIVE LAYOUT SYSTEM ===== */
+:root {
+    /* Layout Variables */
+    --sidebar-width: clamp(240px, 20vw, 280px);
+    --widgets-width: clamp(280px, 22vw, 320px);
+    --sidebar-collapsed: 72px;
+    --bottom-nav-height: 64px;
+    --header-height: clamp(56px, 8vh, 72px);
+    
+    /* Responsive font sizes */
+    --font-size-xs-responsive: clamp(0.75rem, 2vw, 0.875rem);
+    --font-size-sm-responsive: clamp(0.875rem, 2.5vw, 1rem);
+    --font-size-base-responsive: clamp(1rem, 3vw, 1.125rem);
+    --font-size-lg-responsive: clamp(1.125rem, 3.5vw, 1.25rem);
+    --font-size-xl-responsive: clamp(1.25rem, 4vw, 1.5rem);
+}
 
-    <title>Social Media</title>
-    <link rel="stylesheet" href="{% static 'css/app.css' %}">
-    <style>
-        /* Custom styles for the sidebar */
-        .sidebar {
-            background-color: #f8f9fa;
-            height: 100vh;
-            color: black;
-        }
+/* Base Layout */
+.layout {
+    display: grid;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
+}
 
-        .profile-pic {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+/* ===== DESKTOP (≥1024px) ===== */
+@media (min-width: 1024px) {
+    .layout {
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--widgets-width);
+        grid-template-rows: var(--header-height) 1fr;
+        grid-template-areas: 
+            "sidebar header widgets"
+            "sidebar main widgets";
+        gap: 0;
+        margin-left: -112px;
+    }
+    
+    /* Sidebar */
+    .layout__sidebar {
+        grid-area: sidebar;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: 100%;
+        background: var(--color-bg-surface);
+        border-right: 1px solid var(--color-border);
+        padding: clamp(var(--space-4), 2vw, var(--space-6));
+        overflow-y: auto;
+        scrollbar-width: thin;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: var(--z-sticky);
+    }
+    
+    .layout__sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .layout__sidebar::-webkit-scrollbar-thumb {
+        background: var(--color-neutral-400);
+        border-radius: var(--radius-full);
+    }
+    
+    /* Header */
+    .layout__header {
+        grid-area: header;
+        position: sticky;
+        top: 0;
+        z-index: var(--z-fixed);
+        background: var(--color-bg-surface);
+        border-bottom: 1px solid var(--color-border);
+        backdrop-filter: blur(10px);
+        background: color-mix(in srgb, var(--color-bg-surface) 95%, transparent);
+    }
+    
+    /* Main Content */
+    .layout__main {
+        grid-area: main;
+        padding: clamp(var(--space-4), 3vw, var(--space-8));
+        overflow-y: auto;
+        max-width: 800px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    /* Widgets */
+    .layout__widgets {
+        grid-area: widgets;
+        position: sticky;
+        top: var(--header-height);
+        height: calc(100vh - var(--header-height));
+        width: 100%;
+        background: var(--color-bg-surface);
+        border-left: 1px solid var(--color-border);
+        padding: clamp(var(--space-4), 2vw, var(--space-6));
+        overflow-y: auto;
+        scrollbar-width: thin;
+        transition: all 0.3s ease;
+    }
+}
 
-        a {
-            color: black;
-        }
-    </style>
-</head>
+/* ===== TABLET (768px - 1023px) ===== */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .layout {
+        grid-template-columns: var(--sidebar-collapsed) 1fr;
+        grid-template-rows: var(--header-height) 1fr;
+        grid-template-areas: 
+            "sidebar header"
+            "sidebar main";
 
-<body>
-   <!-- this a modal code -->
-<div class="container-fluid">
-    <div class="row">
-        <nav class="col-md-2 d-none d-md-block sidebar" style="position: fixed;">
-            <div class="text-center mt-3">
-                <img src="{{profile.profileimg.url}}" alt="Profile Picture" class="profile-pic">
-                <h4 class="mt-2"><a href="/profile/{{user}}" style="text-decoration:none;">@{{user}}</a></h4>
-            </div>
-            <ul class="nav flex-column mt-4">
-                <li class="nav-item">
-                    <a class="nav-link active" href="/">
-                        <i class="fa-solid fa-house mr-1"></i> Home
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/explore">
-                        <i class="fa-solid fa-compass mr-1"></i> Explore
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal3">
-                        <i class="fa-solid fa-magnifying-glass mr-1"></i> Search
-                    </a>
-                </li>
+    }
+    
+    /* Collapsed Sidebar */
+    .layout__sidebar {
+        grid-area: sidebar;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        width: var(--sidebar-collapsed);
+        background: var(--color-bg-surface);
+        border-right: 1px solid var(--color-border);
+        padding: var(--space-3);
+        transition: all 0.3s ease;
+        overflow-x: hidden;
+    }
+    
+    .layout__sidebar:hover {
+        width: 240px;
+    }
+    
+    .layout__sidebar:hover .sidebar-nav__text,
+    .layout__sidebar:hover .profile-summary {
+        opacity: 1;
+        transform: translateX(0);
+        display: block;
+    }
+    
+    /* Header */
+    .layout__header {
+        grid-area: header;
+        position: sticky;
+        top: 0;
+        z-index: var(--z-sticky);
+        background: var(--color-bg-surface);
+        border-bottom: 1px solid var(--color-border);
+        padding: 0 var(--space-4);
+    }
+    
+    /* Main Content */
+    .layout__main {
+        grid-area: main;
+        padding: var(--space-4);
+        max-width: 100%;
+    }
+    
+    /* Hide widgets on tablet */
+    .layout__widgets {
+        display: none;
+    }
+}
+
+/* ===== MOBILE (≤767px) ===== */
+@media (max-width: 767px) {
+    .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: var(--header-height) 1fr var(--bottom-nav-height);
+        grid-template-areas: 
+            "header"
+            "main"
+            "bottom-nav";
+        padding-bottom: env(safe-area-inset-bottom, 0);
                 
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"
-                        data-bs-whatever="@getbootstrap">
-                        <i class="fa-solid fa-circle-plus mr-1"></i> Create Post
-                    </a>
+    }
+    
+    /* Hide sidebar on mobile */
+    .layout__sidebar {
+        display: none;
+    }
+    
+    /* Header */
+    .layout__header {
+        grid-area: header;
+        position: sticky;
+        top: 0;
+        z-index: var(--z-fixed);
+        background: var(--color-bg-surface);
+        border-bottom: 1px solid var(--color-border);
+        backdrop-filter: blur(10px);
+        background: color-mix(in srgb, var(--color-bg-surface) 95%, transparent);
+        padding: 0 var(--space-3);
+    }
+    
+    /* Main Content */
+    .layout__main {
+        grid-area: main;
+        padding: var(--space-3);
+        padding-bottom: calc(var(--bottom-nav-height) + var(--space-4));
+    }
+    
+    /* Hide widgets on mobile */
+    .layout__widgets {
+        display: none;
+    }
+}
 
+/* ===== SIDEBAR COMPONENTS (Responsive) ===== */
+.profile-summary {
+    text-align: center;
+    padding: clamp(var(--space-3), 2vh, var(--space-6)) 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: clamp(var(--space-4), 3vh, var(--space-8));
+    transition: all 0.3s ease;
+}
 
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/profile/{{user}}">
-                        <i class="fa-solid fa-user mr-1"></i> Profile
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url "logoutt" %}">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <!-- this is the main content code -->
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-            <!-- Your main content goes here -->
-        
-            {% include "modal.html" %}
-            {% comment %} {% include "search.html" %} {% endcomment %}
-        
-        <!-- home posts code -->
-            <div>{% for pos in post %}
-                <div class="container" id="{{pos.id}}">
-                    <div class="row">
-                        <div class="col-md-6 mx-auto">
-                            <div class="post-card"style="border: 1px solid black;margin: 50px;">
-                                <img src="{{pos.image.url}}" alt="Post Image" class="post-image"
-                                    style="height: 584px; width:468px; margin: 25px;">
-                                <div class="post-content"style="margin-left: 19px;">
-                                    <h5><a href="/profile/{{pos.user}}" style="text-decoration: none;">@{{pos.user}}</a></h5>
-                                    <p>{{pos.caption}}</p>
-                                    <p class="text-muted">{{pos.created_at}}</p>
-                                    <hr>
-                                    <div class="d-flex justify-content-between" style="margin-bottom: 8px; margin-right:10px;">
+@media (max-width: 1023px) {
+    .profile-summary {
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+}
+
+.profile-summary__avatar {
+    width: clamp(56px, 8vw, 80px);
+    height: clamp(56px, 8vw, 80px);
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--color-primary-500);
+    margin: 0 auto clamp(var(--space-2), 1vh, var(--space-3));
+    transition: transform 0.3s ease;
+}
+
+.profile-summary__avatar:hover {
+    transform: scale(1.05);
+}
+
+.profile-summary__username {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    display: block;
+    font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+    margin-bottom: var(--space-1);
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(var(--space-1), 1vh, var(--space-2));
+    margin-top: clamp(var(--space-4), 4vh, var(--space-8));
+}
+
+.sidebar-nav__item {
+    display: flex;
+    align-items: center;
+    padding: clamp(var(--space-2), 1.5vh, var(--space-3)) clamp(var(--space-3), 2vw, var(--space-4));
+    border-radius: var(--radius-lg);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+}
+
+.sidebar-nav__item:hover {
+    background-color: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+    color: var(--color-primary-500);
+    transform: translateX(4px);
+}
+
+.sidebar-nav__item--active {
+    background-color: color-mix(in srgb, var(--color-primary-500) 12%, transparent);
+    color: var(--color-primary-500);
+    font-weight: var(--font-weight-semibold);
+}
+
+.sidebar-nav__icon {
+    font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+    width: 24px;
+    min-width: 24px;
+    margin-right: clamp(var(--space-2), 1.5vw, var(--space-3));
+    text-align: center;
+}
+
+.sidebar-nav__text {
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 1023px) {
+    .sidebar-nav__text {
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+}
+
+/* ===== HEADER (Responsive) ===== */
+.header {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: clamp(var(--space-2), 2vw, var(--space-4));
+    padding: 0 clamp(var(--space-3), 3vw, var(--space-6));
+}
+
+.header__logo {
+    font-size: clamp(var(--font-size-lg), 3vw, var(--font-size-xl));
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary-500);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--space-1), 1vw, var(--space-2));
+    min-width: max-content;
+}
+
+.header__logo-icon {
+    color: var(--color-accent-500);
+    font-size: clamp(var(--font-size-lg), 3vw, var(--font-size-xl));
+}
+
+.header__logo-text {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .header__logo-text {
+        display: inline;
+    }
+}
+
+.header__search {
+    flex: 1;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1023px) {
+    .header__search {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 767px) {
+    .header__search {
+        display: none;
+    }
+}
+
+.header__search-input {
+    width: 100%;
+    padding: clamp(var(--space-2), 1.5vh, var(--space-3)) clamp(var(--space-3), 2vw, var(--space-4));
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-primary);
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    transition: all 0.3s ease;
+}
+
+.header__search-input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--space-2), 1.5vw, var(--space-3));
+    margin-left: auto;
+}
+
+.header__action-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    padding: clamp(var(--space-1), 1vh, var(--space-2));
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.header__action-btn:hover {
+    background-color: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+    color: var(--color-primary-500);
+}
+
+.header__notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--color-accent-500);
+    color: white;
+    font-size: var(--font-size-xs);
+    width: 18px;
+    height: 18px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    border: 2px solid var(--color-bg-surface);
+}
+
+/* ===== MAIN FEED (Responsive) ===== */
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(var(--space-6), 4vh, var(--space-10));
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Create Post Component */
+.create-post {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: clamp(var(--radius-lg), 2vw, var(--radius-xl));
+    padding: clamp(var(--space-4), 3vw, var(--space-6));
+    margin-bottom: clamp(var(--space-6), 4vh, var(--space-8));
+}
+
+@media (max-width: 767px) {
+    .create-post {
+        border-radius: var(--radius-lg);
+        border-left: none;
+        border-right: none;
+        margin: calc(-1 * var(--space-3)) calc(-1 * var(--space-3)) var(--space-6);
+        width: calc(100% + 2 * var(--space-3));
+    }
+}
+
+.create-post__header {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(var(--space-2), 2vw, var(--space-3));
+    margin-bottom: clamp(var(--space-3), 2vh, var(--space-4));
+}
+
+.create-post__avatar {
+    width: clamp(40px, 6vw, 48px);
+    height: clamp(40px, 6vw, 48px);
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.create-post__input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--color-text-primary);
+    font-size: clamp(var(--font-size-sm), 2vw, var(--font-size-base));
+    padding: var(--space-2);
+    resize: none;
+    min-height: 60px;
+    line-height: 1.5;
+    font-family: inherit;
+}
+
+.create-post__input:focus {
+    outline: none;
+}
+
+.create-post__input::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+.create-post__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: clamp(var(--space-3), 2vh, var(--space-4));
+    border-top: 1px solid var(--color-border);
+}
+
+.create-post__media-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(var(--space-2), 1vw, var(--space-3));
+}
+
+.create-post__media-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    padding: clamp(var(--space-1), 1vh, var(--space-2)) clamp(var(--space-2), 1.5vw, var(--space-3));
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.create-post__media-btn i {
+    font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+}
+
+.create-post__media-btn:hover {
+    background: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+    color: var(--color-primary-500);
+}
+
+.create-post__submit {
+    background: var(--color-primary-500);
+    color: white;
+    border: none;
+    padding: clamp(var(--space-2), 1.5vh, var(--space-3)) clamp(var(--space-4), 3vw, var(--space-6));
+    border-radius: var(--radius-lg);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.create-post__submit:hover {
+    background: var(--color-primary-600);
+    transform: translateY(-1px);
+}
+
+/* Post Card Responsive */
+.post-card {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: clamp(var(--radius-lg), 2vw, var(--radius-xl));
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 767px) {
+    .post-card {
+        border-radius: var(--radius-lg);
+        border-left: none;
+        border-right: none;
+        margin: 0 calc(-1 * var(--space-3));
+        width: calc(100% + 2 * var(--space-3));
+    }
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.post-card__header {
+    display: flex;
+    align-items: center;
+    padding: clamp(var(--space-3), 2vw, var(--space-4)) clamp(var(--space-4), 3vw, var(--space-6));
+    border-bottom: 1px solid var(--color-border);
+}
+
+@media (max-width: 767px) {
+    .post-card__header {
+        padding: var(--space-3);
+    }
+}
+
+.post-card__avatar {
+    width: clamp(36px, 5vw, 44px);
+    height: clamp(36px, 5vw, 44px);
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    margin-right: clamp(var(--space-2), 1.5vw, var(--space-3));
+    border: 2px solid var(--color-primary-300);
+    flex-shrink: 0;
+}
+
+.post-card__user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.post-card__username {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 2px;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.post-card__username:hover {
+    color: var(--color-primary-500);
+}
+
+.post-card__timestamp {
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    color: var(--color-text-tertiary);
+}
+
+.post-card__menu {
+    color: var(--color-text-tertiary);
+    background: none;
+    border: none;
+    padding: var(--space-1);
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.post-card__menu:hover {
+    background-color: color-mix(in srgb, var(--color-text-tertiary) 10%, transparent);
+    color: var(--color-text-secondary);
+}
+
+.post-card__media {
+    width: 100%;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--color-bg-secondary);
+}
+
+.post-card__content {
+    padding: clamp(var(--space-3), 2vw, var(--space-4)) clamp(var(--space-4), 3vw, var(--space-6));
+}
+
+@media (max-width: 767px) {
+    .post-card__content {
+        padding: var(--space-3);
+    }
+}
+
+.post-card__caption {
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    margin-bottom: clamp(var(--space-2), 1.5vh, var(--space-3));
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.post-card__hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(var(--space-1), 1vw, var(--space-2));
+    margin-bottom: clamp(var(--space-3), 2vh, var(--space-4));
+}
+
+.post-card__hashtag {
+    color: var(--color-primary-500);
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    text-decoration: none;
+    background: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+    padding: clamp(2px, 0.5vh, 4px) clamp(var(--space-2), 1.5vw, var(--space-3));
+    border-radius: var(--radius-full);
+    transition: all 0.3s ease;
+}
+
+.post-card__hashtag:hover {
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+}
+
+.post-card__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(var(--space-3), 2vw, var(--space-6));
+    color: var(--color-text-tertiary);
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    padding-bottom: clamp(var(--space-3), 2vh, var(--space-4));
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: clamp(var(--space-2), 1.5vh, var(--space-3));
+}
+
+.post-card__stat {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--space-1), 1vw, var(--space-2));
+}
+
+.post-card__actions {
+    display: flex;
+    justify-content: space-around;
+    gap: clamp(var(--space-1), 1vw, var(--space-2));
+    padding: clamp(var(--space-2), 1.5vh, var(--space-3)) 0;
+}
+
+@media (max-width: 480px) {
+    .post-card__actions {
+        justify-content: space-between;
+    }
+}
+
+.post-card__action {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--space-1), 1vw, var(--space-2));
+    padding: clamp(var(--space-1), 1vh, var(--space-2)) clamp(var(--space-2), 1.5vw, var(--space-4));
+    border: none;
+    background: none;
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+}
+
+@media (max-width: 480px) {
+    .post-card__action {
+        flex-direction: column;
+        gap: 2px;
+        padding: var(--space-1);
+    }
+}
+
+.post-card__action:hover {
+    background-color: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+    color: var(--color-primary-500);
+}
+
+.post-card__action-icon {
+    font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    .post-card__action-icon {
+        font-size: var(--font-size-lg);
+    }
+}
+
+.post-card__action:hover .post-card__action-icon {
+    transform: scale(1.1);
+}
+
+.post-card__action--like.post-card__action--active {
+    color: var(--color-accent-500);
+}
+
+.post-card__action--like.post-card__action--active:hover {
+    background-color: color-mix(in srgb, var(--color-accent-500) 8%, transparent);
+}
+
+/* ===== WIDGETS (Responsive) ===== */
+.widgets-section {
+    margin-bottom: clamp(var(--space-6), 4vh, var(--space-8));
+}
+
+.widgets-section__title {
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: clamp(var(--space-3), 2vh, var(--space-4));
+}
+
+.trending-item {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(var(--space-2), 1.5vw, var(--space-3));
+    padding: clamp(var(--space-2), 1.5vh, var(--space-3)) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.trending-item__number {
+    font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-tertiary);
+    min-width: 24px;
+}
+
+.trending-item__content {
+    flex: 1;
+}
+
+.trending-item__title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+}
+
+.trending-item__count {
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    color: var(--color-text-tertiary);
+}
+
+.suggested-user {
+    display: flex;
+    align-items: center;
+    gap: clamp(var(--space-2), 1.5vw, var(--space-3));
+    padding: clamp(var(--space-2), 1.5vh, var(--space-3)) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.suggested-user__avatar {
+    width: clamp(36px, 5vw, 44px);
+    height: clamp(36px, 5vw, 44px);
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.suggested-user__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggested-user__name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    display: block;
+    margin-bottom: 2px;
+    text-decoration: none;
+    font-size: clamp(var(--font-size-sm), 1.8vw, var(--font-size-base));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggested-user__username {
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    color: var(--color-text-tertiary);
+}
+
+.follow-btn {
+    background: var(--color-primary-500);
+    color: white;
+    border: none;
+    padding: clamp(4px, 0.8vh, 8px) clamp(var(--space-2), 1.5vw, var(--space-3));
+    border-radius: var(--radius-base);
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.follow-btn:hover {
+    background: var(--color-primary-600);
+}
+
+/* ===== BOTTOM NAVIGATION (Mobile) ===== */
+.bottom-nav {
+    grid-area: bottom-nav;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottom-nav-height);
+    background: color-mix(in srgb, var(--color-bg-surface) 95%, transparent);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: var(--z-fixed);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (max-width: 767px) {
+    .bottom-nav {
+        padding-left: env(safe-area-inset-left, 0);
+        padding-right: env(safe-area-inset-right, 0);
+    }
+}
+
+.bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding: var(--space-2);
+    border-radius: var(--radius-base);
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 80px;
+}
+
+.bottom-nav__item:hover {
+    color: var(--color-primary-500);
+    background: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+}
+
+.bottom-nav__item--active {
+    color: var(--color-primary-500);
+}
+
+.bottom-nav__icon {
+    font-size: clamp(var(--font-size-lg), 3vw, var(--font-size-xl));
+    margin-bottom: 2px;
+}
+
+.bottom-nav__label {
+    font-size: clamp(var(--font-size-xs), 1.5vw, var(--font-size-sm));
+    font-weight: var(--font-weight-medium);
+}
+
+/* ===== MOBILE MENU TOGGLE ===== */
+.mobile-menu-toggle {
+    display: none;
+    position: fixed;
+    top: var(--space-3);
+    left: var(--space-3);
+    z-index: var(--z-modal);
+    background: var(--color-primary-500);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 767px) {
+    .mobile-menu-toggle {
+        display: flex;
+    }
+}
+
+.mobile-menu-toggle:hover {
+    transform: scale(1.1);
+}
+
+/* ===== MOBILE SIDEBAR OVERLAY ===== */
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--color-bg-surface);
+    border-right: 1px solid var(--color-border);
+    z-index: var(--z-modal);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    padding: var(--space-6) var(--space-4);
+    padding-top: calc(var(--header-height) + var(--space-6));
+}
+
+.mobile-sidebar--open {
+    left: 0;
+}
+
+.mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: calc(var(--z-modal) - 1);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.mobile-sidebar-overlay--visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.desktop-only {
+    display: none;
+}
+
+.tablet-only {
+    display: none;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .desktop-only {
+        display: block;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .tablet-only {
+        display: block;
+    }
+}
+
+@media (max-width: 767px) {
+    .mobile-only {
+        display: block;
+    }
+}
+
+/* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
+@media (hover: none) and (pointer: coarse) {
+    .post-card:hover {
+        transform: none;
+    }
+    
+    .post-card__action:hover {
+        background: none;
+    }
+    
+    .sidebar-nav__item:hover {
+        transform: none;
+    }
+    
+    /* Larger touch targets */
+    .post-card__action,
+    .create-post__media-btn,
+    .header__action-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .bottom-nav__item {
+        min-height: 60px;
+    }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .post-card:hover {
+        transform: none;
+    }
+}
+{% endblock style %}
+
+{% block content %}
+<div class="layout">
+    <!-- Desktop & Tablet Sidebar -->
+    
+    <!-- Header -->
+    <header class="layout__header">
+        <div class="header">
+            <a href="/" class="header__logo">
+                <i class="fas fa-fire header__logo-icon"></i>
+                <span class="desktop-only">SocialHub</span>
+            </a>
             
-                                        <a href="/like-post/{{pos.id}}" class="btn btn-outline-primary">Like</a>
+            <div class="header__search desktop-only">
+                <input type="text" 
+                       placeholder="Search posts, people, or tags..." 
+                       class="form-control"
+                       style="background: var(--color-bg-secondary); border-color: var(--color-border);">
+            </div>
             
-                                        {% if pos.no_of_likes == 0 %}
-                                        <p>0</p>
-                                        {% elif pos.no_of_likes == 1 %}
-                                        <p>Liked by {{pos.no_of_likes}} person</p>
-                                        {% else %}
-                                        <p>Liked by {{pos.no_of_likes}} people</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
+            <div class="header__actions">
+                <a href="#" class="header__notification" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <i class="fas fa-circle-plus"></i>
+                </a>
+                <a href="#" class="header__notification" data-bs-toggle="modal" data-bs-target="#exampleModal3">
+                    <i class="fas fa-search"></i>
+                </a>
+                <a href="#" class="header__notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="header__notification-badge">3</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Feed -->
+    <main class="layout__main">
+        {% include "modal.html" %}
+        {% include "search.html" %}
+        
+        <!-- Create Post (Desktop/Tablet) -->
+        <div class="create-post desktop-only tablet-only">
+            <div class="create-post__header">
+                <img src="{{profile.profileimg.url}}" 
+                     alt="Profile Picture" 
+                     class="create-post__avatar">
+                <textarea class="create-post__input" 
+                          placeholder="What's on your mind, @{{user}}?"></textarea>
+            </div>
+            <div class="create-post__actions">
+                <div class="create-post__media-buttons">
+                    <button class="create-post__media-btn">
+                        <i class="fas fa-image"></i> Photo
+                    </button>
+                    <button class="create-post__media-btn">
+                        <i class="fas fa-video"></i> Video
+                    </button>
+                    <button class="create-post__media-btn">
+                        <i class="fas fa-smile"></i> Feeling
+                    </button>
+                </div>
+                <button class="create-post__submit">Post</button>
+            </div>
+        </div>
+        
+        <!-- Feed Posts -->
+        <div class="feed">
+            {% for pos in post %}
+            <article class="post-card" id="{{pos.id}}">
+                <!-- Post Header -->
+                <header class="post-card__header">
+                    <img src="{{pos.profileimg}}" 
+                         alt="{{pos.user}}'s profile picture" 
+                         class="post-card__avatar">
+                    <div class="post-card__user-info">
+                        <a href="/profile/{{pos.user}}" class="post-card__username">@{{pos.user}}</a>
+                        <time class="post-card__timestamp">{{pos.created_at|timesince}} ago</time>
+                    </div>
+                    <button class="post-card__menu">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </header>
+                
+                <!-- Post Content -->
+                {% if pos.caption %}
+                <div class="post-card__content">
+                    <p class="post-card__caption">{{pos.caption}}</p>
+                    {% if pos.hashtags %}
+                    <div class="post-card__hashtags">
+                        {% for tag in pos.hashtags %}
+                        <a href="/explore?tag={{tag}}" class="post-card__hashtag">#{{tag}}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Post Image -->
+                {% if pos.image %}
+                <img src="{{ pos.image.url }}" 
+                     alt="Post Image" 
+                     class="post-card__media"
+                     loading="lazy">
+                {% endif %}
+                
+                <!-- Post Stats -->
+                <div class="post-card__content">
+                    <div class="post-card__stats">
+                        <div class="post-card__stat">
+                            <i class="fas fa-heart"></i>
+                            <span>{{pos.no_of_like}} likes</span>
+                        </div>
+                        <div class="post-card__stat">
+                            <i class="fas fa-comment"></i>
+                            <span>{{pos.comments.count}} comments</span>
                         </div>
                     </div>
+                    
+                    <!-- Post Actions -->
+                    <div class="post-card__actions">
+                        <a href="{% url 'like-post' pos.id %} " style="text-decoration: none;" class="post-card__action post-card__action--like {% if pos.is_liked %}post-card__action--active{% endif %}" data-post-id="{{pos.id}}">
+                            <i class="{% if pos.is_liked %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
+                            <span>Like</span>
+                        </a>
+
+                        <button class="post-card__action">
+                            <i class="far fa-comment"></i>
+                            <span>Comment</span>
+                        </button>
+                        <button class="post-card__action">
+                            <i class="far fa-share-square"></i>
+                            <span>Share</span>
+                        </button>
+                    </div>
                 </div>
-                {% endfor %}
-            
+            </article>
+            {% endfor %}
+        </div>
+    </main>
+    
+    <!-- Desktop Widgets -->
+    <aside class="layout__widgets desktop-only">
+        <!-- Trending Section -->
+        <div class="widgets-section">
+            <h3 class="widgets-section__title">Trending Now</h3>
+            <div class="trending-item">
+                <div class="trending-item__number">1</div>
+                <div class="trending-item__content">
+                    <div class="trending-item__title">#WebDevelopment</div>
+                    <div class="trending-item__count">2.5k posts</div>
+                </div>
             </div>
+            <div class="trending-item">
+                <div class="trending-item__number">2</div>
+                <div class="trending-item__content">
+                    <div class="trending-item__title">#DesignInspiration</div>
+                    <div class="trending-item__count">1.8k posts</div>
+                </div>
+            </div>
+            <div class="trending-item">
+                <div class="trending-item__number">3</div>
+                <div class="trending-item__content">
+                    <div class="trending-item__title">#TechNews</div>
+                    <div class="trending-item__count">1.2k posts</div>
+                </div>
+            </div>
+        </div>
         
+        <!-- Suggested Users -->
+        <div class="widgets-section">
+            <h3 class="widgets-section__title">Suggested for you</h3>
+            <div class="suggested-user">
+                <img src="https://via.placeholder.com/40" 
+                     alt="User" 
+                     class="suggested-user__avatar">
+                <div class="suggested-user__info">
+                    <a href="#" class="suggested-user__name">Alex Johnson</a>
+                    <div class="suggested-user__username">@alexj</div>
+                </div>
+                <button class="follow-btn">Follow</button>
+            </div>
+            <div class="suggested-user">
+                <img src="https://via.placeholder.com/40" 
+                     alt="User" 
+                     class="suggested-user__avatar">
+                <div class="suggested-user__info">
+                    <a href="#" class="suggested-user__name">Sarah Miller</a>
+                    <div class="suggested-user__username">@sarahm</div>
+                </div>
+                <button class="follow-btn">Follow</button>
+            </div>
+        </div>
         
-        </main>
-
-
-    </div>
+        <!-- Footer Links -->
+        <div class="widgets-section">
+            <p class="text-sm text-tertiary">
+                <a href="#" class="text-tertiary">About</a> · 
+                <a href="#" class="text-tertiary">Help</a> · 
+                <a href="#" class="text-tertiary">Terms</a> · 
+                <a href="#" class="text-tertiary">Privacy</a>
+            </p>
+            <p class="text-xs text-tertiary mt-2">© 2026 SocialHub. All rights reserved.</p>
+        </div>
+    </aside>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="bottom-nav mobile-only">
+        <a href="/" class="bottom-nav__item bottom-nav__item--active">
+            <i class="fas fa-home bottom-nav__icon"></i>
+            <span class="bottom-nav__label">Home</span>
+        </a>
+        <a href="/explore" class="bottom-nav__item">
+            <i class="fas fa-compass bottom-nav__icon"></i>
+            <span class="bottom-nav__label">Explore</span>
+        </a>
+        <a href="#" class="bottom-nav__item" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <i class="fas fa-circle-plus bottom-nav__icon"></i>
+            <span class="bottom-nav__label">Create</span>
+        </a>
+        <a href="#" class="bottom-nav__item" data-bs-toggle="modal" data-bs-target="#exampleModal3">
+            <i class="fas fa-search bottom-nav__icon"></i>
+            <span class="bottom-nav__label">Search</span>
+        </a>
+        <a href="/profile/{{user}}" class="bottom-nav__item">
+            <i class="fas fa-user bottom-nav__icon"></i>
+            <span class="bottom-nav__label">Profile</span>
+        </a>
+    </nav>
 </div>
-   
-    <script src="{% static 'js/app.js'%}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-</body>
 
-</html>
+<script>
+    // Like Button Functionality
+    document.querySelectorAll('.post-card__action--like').forEach(button => {
+        button.addEventListener('click', function(e) {
+            
+            const postId = this.getAttribute('data-post-id');
+            const isLiked = this.getAttribute('data-liked') === 'true';
+            const newState = !isLiked;
+            
+            this.setAttribute('data-liked', newState);
+            
+            // Update icon
+            const icon = this.querySelector('i');
+            if (newState) {
+                icon.className = 'fas fa-heart';
+                this.classList.add('post-card__action--active');
+                
+                // Add animation
+                this.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            } else {
+                icon.className = 'far fa-heart';
+                this.classList.remove('post-card__action--active');
+            }
+            
+            // In production, make an API call here
+            console.log(`Post ${postId} ${newState ? 'liked' : 'unliked'}`);
+        });
+    });
+    
+    // Mobile menu toggle for tablets
+    const sidebar = document.querySelector('.layout__sidebar');
+    if (sidebar) {
+        sidebar.addEventListener('click', function(e) {
+            if (window.innerWidth <= 1199 && window.innerWidth >= 768) {
+                this.classList.toggle('expanded');
+                if (this.classList.contains('expanded')) {
+                    this.style.width = '250px';
+                    document.querySelectorAll('.sidebar-nav__text').forEach(text => {
+                        text.style.display = 'block';
+                    });
+                } else {
+                    this.style.width = '72px';
+                    document.querySelectorAll('.sidebar-nav__text').forEach(text => {
+                        text.style.display = 'none';
+                    });
+                }
+            }
+        });
+    }
+    
+    // Create post functionality
+    const createPostBtn = document.querySelector('.create-post__submit');
+    if (createPostBtn) {
+        createPostBtn.addEventListener('click', function() {
+            const textarea = document.querySelector('.create-post__input');
+            if (textarea.value.trim()) {
+                // In production, submit via AJAX
+                alert('Post created!');
+                textarea.value = '';
+            } else {
+                textarea.focus();
+            }
+        });
+    }
+</script>
+{% endblock content %}

@@ -1,0 +1,481 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{user_profile.user}}{% endblock title %}
+
+{% block style %}
+/* Profile Container */
+.profile-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Profile Header */
+.profile-header {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800));
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+}
+
+.profile-avatar-container {
+    position: absolute;
+    bottom: 1px;
+    left: 40px;
+    z-index: 10;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border: 5px solid var(--color-bg-surface);
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.3s ease;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+}
+
+.profile-info {
+    position: absolute;
+    bottom: 20px;
+    left: 220px;
+    color: white;
+}
+
+.profile-username {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.profile-location {
+    font-size: 1rem;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.follow-btn-container {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+}
+
+.follow-btn {
+    background: white;
+    color: var(--color-primary-600);
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.follow-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Profile Stats */
+.profile-stats {
+    background: var(--color-bg-surface);
+    padding: 30px 40px;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary-600);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Profile Content */
+.profile-content {
+    background: var(--color-bg-surface);
+    border-radius: 0 0 20px 20px;
+    padding: 30px 40px;
+}
+
+/* About Section */
+.about-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--color-primary-200);
+}
+
+.bio-text {
+    background: var(--color-bg-secondary);
+    padding: 20px;
+    border-radius: 12px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+/* Photos Grid */
+.photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.photo-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-border);
+}
+
+.photo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-300);
+}
+
+.photo-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.photo-content {
+    background-color: #142962;
+    padding: 15px;
+}
+
+.photo-caption {
+    font-size: 0.95rem;
+    color: white;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.photo-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+}
+
+.delete-btn {
+    color: var(--color-accent-600);
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: var(--color-accent-50);
+    transform: scale(1.1);
+}
+
+/* Edit Profile Button */
+.edit-profile-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.edit-profile-btn:hover {
+    background: white;
+    color: var(--color-primary-600);
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-header {
+        height: 240px;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .profile-avatar-container {
+        bottom: 1px;
+        left: 20px;
+    }
+    
+    .profile-info {
+        left: 160px;
+        bottom: 15px;
+    }
+    
+    .profile-username {
+        font-size: 1.5rem;
+    }
+    
+    .follow-btn-container {
+        right: 20px;
+        bottom: 15px;
+    }
+    
+    .profile-stats {
+        padding: 20px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .profile-content {
+        padding: 20px;
+    }
+    
+    .photos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        height: 200px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-info {
+        left: 20px;
+        right: 20px;
+        bottom: 60px;
+        text-align: center;
+    }
+    
+    .follow-btn-container {
+        left: 0;
+        right: 0;
+        bottom: 20px;
+        text-align: center;
+    }
+    
+    .profile-stats {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .photos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Loading Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.photo-card.loading {
+    background: linear-gradient(90deg, 
+        var(--color-border) 25%, 
+        var(--color-bg-secondary) 50%, 
+        var(--color-border) 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-tertiary);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+}
+{% endblock style %}
+
+{% block content %}
+<main class="profile-container">
+    {% include "search.html" %}
+    {% include "profile_upload.html" %}
+    {% include "edit_profile.html" %}
+    {% include "modal.html" %}
+    
+    <!-- Profile Header -->
+    <div class="profile-header">
+        {% if user == user_profile.user %}
+        <button type="button" class="edit-profile-btn" data-bs-toggle="modal" data-bs-target="#exampleModal1">
+            <i class="fas fa-edit"></i> Edit Profile
+        </button>
+        {% endif %}
+        
+        <div class="profile-avatar-container">
+            <img src="{{user_profile.profileimg.url}}" 
+                 alt="Profile Picture" 
+                 class="profile-avatar">
+        </div>
+        
+        <div class="profile-info">
+            <h1 class="profile-username">@{{user_profile.user}}</h1>
+            <div class="profile-location">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>{{user_profile.location|default:"Earth"}}</span>
+            </div>
+        </div>
+        
+        <div class="follow-btn-container">
+            {% if user != user_profile.user %}
+            <form action="/follow" method="POST" class="follow-form">
+                {% csrf_token %}
+                <input type="hidden" value="{{user.username}}" name="follower">
+                <input type="hidden" value="{{user_object.username}}" name="user">
+                <button type="submit" class="follow-btn">
+                    {{follow_unfollow}}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Profile Stats -->
+    <div class="profile-stats">
+        <div class="stat-item">
+            <span class="stat-number">{{user_post_length}}</span>
+            <span class="stat-label">Posts</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{user_followers}}</span>
+            <span class="stat-label">Followers</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{user_following}}</span>
+            <span class="stat-label">Following</span>
+        </div>
+    </div>
+    
+    <!-- Profile Content -->
+    <div class="profile-content">
+        <!-- About Section -->
+        <div class="about-section">
+            <h2 class="section-title">About</h2>
+            <div class="bio-text">
+                {{user_profile.bio|default:"No bio yet. Tell people about yourself!"}}
+            </div>
+        </div>
+        
+        <!-- Photos Section -->
+        <div class="photos-section">
+            <h2 class="section-title">Photos</h2>
+            
+            {% if user_posts %}
+            <div class="photos-grid">
+                {% for pos in user_posts %}
+                <div class="photo-card">
+                    <img src="{{pos.image.url}}" 
+                         alt="{{pos.caption}}" 
+                         class="photo-image">
+                    <div class="photo-content">
+                        <p class="photo-caption">{{pos.caption|truncatechars:60}}</p>
+                        <div class="photo-actions">
+                            {% if user == user_profile.user %}
+                            <a href="/delete/{{pos.id}}" class="delete-btn" title="Delete Post">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-camera"></i>
+                <p>No posts yet. Share your first photo!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<script>
+// Add loading animation to photo cards
+document.querySelectorAll('.photo-card').forEach(card => {
+    card.classList.add('loading');
+    
+    const img = card.querySelector('img');
+    if (img.complete) {
+        card.classList.remove('loading');
+    } else {
+        img.addEventListener('load', () => {
+            card.classList.remove('loading');
+        });
+        img.addEventListener('error', () => {
+            card.classList.remove('loading');
+        });
+    }
+});
+
+// Smooth scroll for profile sections
+document.querySelectorAll('.section-title').forEach(title => {
+    title.style.cursor = 'pointer';
+    title.addEventListener('click', function() {
+        const section = this.parentElement;
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+{% endblock content %}

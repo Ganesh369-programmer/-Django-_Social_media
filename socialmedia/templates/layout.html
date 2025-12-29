@@ -1,0 +1,144 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% comment %} <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> {% endcomment %}
+    <script src="https://kit.fontawesome.com/cb792c0850.js" crossorigin="anonymous"></script>
+
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <!-- Google Fonts: Geist + Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <title>{% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    
+    <style>
+     
+
+        {% block style %} {% endblock style %}
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </div>
+   
+    <!-- Mobile Navigation Toggle -->
+    <div class="mobile-nav-toggle d-lg-none" style="position: fixed; top: var(--space-4); left: var(--space-4); z-index: var(--z-fixed);">
+        <button class="btn btn-primary" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="sidebar" id="sidebar">
+                <div class="text-center mt-3">
+                    <img src="{{profile.profileimg.url}}" alt="Profile Picture" class="profile-pic">
+                    <h4 class="mt-3 font-semibold">
+                        <a href="/profile/{{user}}" style="text-decoration:none;" class="gradient-text">@{{user}}</a>
+                    </h4>
+                    <p class="text-sm text-tertiary mt-1">Social Media User</p>
+                </div>
+                
+                <ul class="nav flex-column mt-5">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fa-solid fa-house"></i> 
+                            <span>Home</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explore">
+                            <i class="fa-solid fa-compass"></i> 
+                            <span>Explore</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal3">
+                            <i class="fa-solid fa-magnifying-glass"></i> 
+                            <span>Search</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                            data-bs-whatever="@getbootstrap">
+                            <i class="fa-solid fa-circle-plus"></i> 
+                            <span>Create Post</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/{{user}}">
+                            <i class="fa-solid fa-user"></i> 
+                            <span>Profile</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "liked_list" %}">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                            <span>Liked Post</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url "logoutt" %}" data-action="logout">
+                            <i class="fa-solid fa-right-from-bracket"></i> 
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Theme info in sidebar -->
+                <div class="mt-auto pt-6">
+                    <div class="surface" style="padding: var(--space-4);">
+                        <p class="text-sm text-secondary mb-2">Current Theme</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="font-medium" id="themeName">Dark Mode</span>
+                            <span class="text-xs text-tertiary">Click icon to toggle</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            
+                {% block content %}
+                {% endblock content %}
+            
+        </div>
+    </div>
+   
+    <div class="modal fade" id="fullImageModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark">
+      <div class="modal-body p-0 text-center">
+        <img id="modalImage" class="img-fluid w-100">
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script src="{% static 'js/app.js'%}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    
+   
+</body>
+</html>

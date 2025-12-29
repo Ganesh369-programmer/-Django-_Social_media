@@ -200,6 +200,12 @@ a:hover::after {
                                     </div>
                                     {% endif %}
 
+                                    {% if msg %}
+                                    <div class="alert alert-danger animate__animated animate__shakeX" role="alert">
+                                        <i class="fas fa-exclamation-circle me-2"></i>{{ msg }}
+                                    </div>
+                                    {% endif %}
+
                                     <form class="mx-1 mx-md-4" method="post" id="signupForm">
                                         {% csrf_token %}
                                         <div class="d-flex flex-row align-items-center mb-4">

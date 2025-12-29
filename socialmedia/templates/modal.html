@@ -1,4 +1,113 @@
 {% load static %}
+<style>
+    /* Modal Content */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+/* Modal Header */
+.modal-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    border-bottom: none;
+    padding: 18px 25px;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+/* Close Button */
+.btn-close {
+    filter: invert(1);
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 25px;
+    background: #fafafa;
+}
+
+/* Upload Image Icon */
+.modal-body img {
+    display: block;
+    margin: 0 auto 10px;
+    width: 70px;
+    opacity: 0.9;
+}
+
+/* Labels */
+.col-form-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+/* Inputs */
+.form-control {
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.15rem rgba(102, 126, 234, 0.25);
+}
+
+/* Textarea */
+textarea.form-control {
+    resize: none;
+    min-height: 100px;
+}
+
+/* Modal Footer */
+.modal-footer {
+    border-top: none;
+    padding: 15px 25px 25px;
+    background: #fafafa;
+}
+
+/* Buttons */
+.modal-footer .btn {
+    border-radius: 25px;
+    padding: 8px 22px;
+    font-weight: 500;
+}
+
+/* Primary Button */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #d6d6d6;
+}
+
+/* Mobile Optimization */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 10px;
+    }
+}
+
+</style>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

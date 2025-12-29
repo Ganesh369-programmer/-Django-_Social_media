@@ -1,0 +1,275 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}Explore{% endblock title %}
+
+
+
+{% block content %}
+<main role="main" class="main-content">
+    {% include "modal.html" %}
+    {% include "search.html" %}
+    
+    <!-- Layout Toggle -->
+    <div class="container-fluid mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h2 font-bold gradient-text">Explore</h1>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" id="gridViewBtn">
+                    <i class="fas fa-th-large"></i> Grid
+                </button>
+                <button type="button" class="btn btn-outline-primary" id="listViewBtn">
+                    <i class="fas fa-list"></i> List
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grid View -->
+    <div class="container-fluid" id="gridView">
+        <div class="explore-grid">
+            {% for pos in post %}
+            <article class="post-card">
+                <!-- Header -->
+                <header class="post-card__header">
+                    <img src="{{pos.profileimg}}" 
+                         alt="{{pos.user}}'s profile picture" 
+                         class="post-card__avatar">
+                    <div class="post-card__user-info">
+                        <a href="/profile/{{pos.user}}" class="post-card__username">
+                            @{{pos.user}}
+                        </a>
+                        <time class="post-card__timestamp">
+                            {{pos.created_at|timesince}} ago
+                        </time>
+                    </div>
+                    <div class="post-card__actions">
+                        <button class="post-card__action-btn" title="More options">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </header>
+                
+                <!-- Content -->
+                <div class="post-card__content">
+                    {% if pos.caption %}
+                    <p class="post-card__caption">{{pos.caption}}</p>
+                    {% endif %}
+                    
+                    {% if pos.image %}
+                    <div class="post-card__media-container">
+                       <img src="{{ pos.image.url }}"
+                            class="post-card__image"
+                            style="cursor:pointer;">
+
+
+
+                        <div class="post-card__image-overlay"
+                            data-bs-toggle="modal"
+                            data-bs-target="#fullImageModal"
+                            onclick="setModalImage('{{ pos.image.url }}')">
+
+                            <div class="post-card__overlay-content">
+                                <a href="/profile/{{pos.user}}" class="post-card__overlay-username">
+                                    @{{pos.user}}
+                                </a>
+                                {% if pos.caption %}
+                                <p class="post-card__overlay-caption">
+                                    {{pos.caption|truncatechars:100}}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Footer -->
+                <footer class="post-card__footer">
+                    <div class="post-card__stats">
+                        <div class="post-card__stat">
+                            <i class="fas fa-heart post-card__stat-icon"></i>
+                            <span>{{pos.no_of_likes}}</span>
+                        </div>
+                        <div class="post-card__stat">
+                            <i class="fas fa-comment post-card__stat-icon"></i>
+                            <span>{{pos.comments.count}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-card__actions-bar">
+                        <button class="post-card__action post-card__action--like" 
+                                data-post-id="{{pos.id}}"
+                                data-liked="false">
+                            <i class="fas fa-heart post-card__action-icon"></i>
+                            <span class="post-card__action-text">Like</span>
+                        </button>
+                        
+                        <button class="post-card__action post-card__action--comment">
+                            <i class="fas fa-comment post-card__action-icon"></i>
+                            <span class="post-card__action-text">Comment</span>
+                        </button>
+                        
+                        <button class="post-card__action post-card__action--share">
+                            <i class="fas fa-share-alt post-card__action-icon"></i>
+                            <span class="post-card__action-text">Share</span>
+                        </button>
+                    </div>
+                </footer>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+    
+
+    <!-- List View (Hidden by default) -->
+    <div class="container-fluid d-none" id="listView">
+        <div class="row">
+            {% for pos in post %}
+            <div class="col-12 mb-4">
+                <article class="post-card post-card--compact">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            {% if pos.image %}
+                            <div class="post-card__media-container h-100">
+                                <img src="{{ pos.image.url }}"
+                                    class="post-card__image"
+                                    style="cursor:pointer;">
+
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <div class="post-card__content h-100 d-flex flex-column">
+                                <header class="post-card__header border-0">
+                                    <img src="{{pos.profileimg}}" 
+                                         alt="{{pos.user}}'s profile picture" 
+                                         class="post-card__avatar">
+                                    <div class="post-card__user-info">
+                                        <a href="/profile/{{pos.user}}" class="post-card__username">
+                                            @{{pos.user}}
+                                        </a>
+                                        <time class="post-card__timestamp">
+                                            {{pos.created_at|timesince}} ago
+                                        </time>
+                                    </div>
+                                </header>
+                                
+                                {% if pos.caption %}
+                                <p class="post-card__caption flex-grow-1">{{pos.caption}}</p>
+                                {% endif %}
+                                
+                                <footer class="post-card__footer border-0 pt-0">
+                                    <div class="post-card__actions-bar">
+                                        <button class="post-card__action post-card__action--like">
+                                            <i class="fas fa-heart post-card__action-icon"></i>
+                                            <span>{{pos.no_of_likes}}</span>
+                                        </button>
+                                        
+                                        <button class="post-card__action post-card__action--comment">
+                                            <i class="fas fa-comment post-card__action-icon"></i>
+                                            <span>{{pos.comments.count}}</span>
+                                        </button>
+                                    </div>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+
+
+</main>
+
+<!-- Modal for full image display -->
+<div class="modal fade" id="fullImageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 text-center">
+                <img id="modalImage" class="img-fluid w-100 rounded" src="">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+  
+function setModalImage(src) {
+    document.getElementById("modalImage").src = src;
+}
+
+
+
+
+
+
+    // View Toggle Functionality
+    const gridViewBtn = document.getElementById('gridViewBtn');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    
+    gridViewBtn.addEventListener('click', () => {
+        gridView.classList.remove('d-none');
+        listView.classList.add('d-none');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+    });
+    
+    listViewBtn.addEventListener('click', () => {
+        gridView.classList.add('d-none');
+        listView.classList.remove('d-none');
+        gridViewBtn.classList.remove('active');
+        listViewBtn.classList.add('active');
+    });
+    
+    // Like Button Functionality
+    document.querySelectorAll('.post-card__action--like').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            const isLiked = this.getAttribute('data-liked') === 'true';
+            
+            // Toggle state
+            const newState = !isLiked;
+            this.setAttribute('data-liked', newState);
+            
+            // Update UI
+            if (newState) {
+                this.classList.add('post-card__action--active');
+                this.querySelector('.post-card__action-icon').className = 'fas fa-heart post-card__action-icon';
+            } else {
+                this.classList.remove('post-card__action--active');
+                this.querySelector('.post-card__action-icon').className = 'far fa-heart post-card__action-icon';
+            }
+            
+            // In a real app, you would make an API call here
+            console.log(`Post ${postId} ${newState ? 'liked' : 'unliked'}`);
+        });
+    });
+    
+    // Image hover effect enhancement
+    document.querySelectorAll('.post-card__media-container').forEach(container => {
+        container.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateZ(10px)';
+        });
+        
+        container.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+    });
+</script>
+
+{% endblock content %}

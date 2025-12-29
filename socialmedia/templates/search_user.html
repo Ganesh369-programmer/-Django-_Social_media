@@ -1,0 +1,115 @@
+        
+<style>
+/* General Page Styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Main Heading */
+h1 {
+    text-align: center;
+    margin-top: 40px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Container */
+.container {
+    width: 90%;
+    max-width: 700px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+/* Section Title */
+.container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #444;
+    font-weight: 600;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table tr {
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.table tr:hover {
+    background: #f3f4ff;
+    transform: translateY(-2px);
+}
+
+/* Username Row */
+.table td {
+    padding: 15px;
+    text-align: center;
+}
+
+/* Username Link */
+.table a {
+    text-decoration: none;
+    color: #5a67d8;
+    font-size: 22px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.table a:hover {
+    color: #764ba2;
+}
+
+/* Remove Table Borders */
+.table td,
+.table th {
+    border: none;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .table a {
+        font-size: 18px;
+    }
+
+    .container {
+        padding: 20px;
+    }
+}
+
+</style>
+                <h1>Search Results for "{{ query }}"</h1>
+                <div class="container">
+                    <h2>User Profiles</h2>
+                    
+                    <table class="table">
+                        
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td style="width: 100px;">
+                                    <img src="{{user.profileimg.url}}" alt="{{user.user.username}}'s profile image" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:2px solid #764ba2;">
+                                </td>
+                                <td>
+                                    <h2 style="margin:0;"><a href="/profile/{{user.user.username}}">@{{user.user.username}}</a></h2>
+                                    <div style="color:#666; font-size:16px; margin-top:8px;">{{user.bio|default:'No bio available.'}}</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            
+                            
+                        </tbody>
+                    </table>
+                </div>
+                

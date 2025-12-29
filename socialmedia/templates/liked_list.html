@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    
+    {% if view_like %}
+    <main role="main" class="main-content">
+        <h2>Your Liked Posts</h2>
+    <div class="container-fluid" id="gridView">
+        <div class="explore-grid">
+            {% for pos in view_like %}
+            <article class="post-card">
+                <!-- Header -->
+                <header class="post-card__header">
+                    <img src="{{pos.profileimg}}" 
+                         alt="{{pos.user}}'s profile picture" 
+                         class="post-card__avatar">
+                    <div class="post-card__user-info">
+                        <a href="/profile/{{pos.user}}" class="post-card__username">
+                            @{{pos.user}}
+                        </a>
+                        <time class="post-card__timestamp">
+                            {{pos.created_at|timesince}} ago
+                        </time>
+                    </div>
+                    <div class="post-card__actions">
+                        <button class="post-card__action-btn" title="More options">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </header>
+                
+                <!-- Content -->
+                <div class="post-card__content">
+                    {% if pos.caption %}
+                    <p class="post-card__caption">{{pos.caption}}</p>
+                    {% endif %}
+                    
+                    {% if pos.image %}
+                    <div class="post-card__media-container">
+                       <img src="{{ pos.image.url }}"
+                            class="post-card__image"
+                            style="cursor:pointer;">
+
+
+
+                        <div class="post-card__image-overlay"
+                            data-bs-toggle="modal"
+                            data-bs-target="#fullImageModal"
+                            onclick="setModalImage('{{ pos.image.url }}')">
+
+                            <div class="post-card__overlay-content">
+                                <a href="/profile/{{pos.user}}" class="post-card__overlay-username">
+                                    @{{pos.user}}
+                                </a>
+                                {% if pos.caption %}
+                                <p class="post-card__overlay-caption">
+                                    {{pos.caption|truncatechars:100}}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Footer -->
+                <footer class="post-card__footer">
+                    <div class="post-card__stats">
+                        <div class="post-card__stat">
+                            <i class="fas fa-heart post-card__stat-icon"></i>
+                            <span>{{pos.no_of_likes}}</span>
+                        </div>
+                        <div class="post-card__stat">
+                            <i class="fas fa-comment post-card__stat-icon"></i>
+                            <span>{{pos.comments.count}}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-card__actions-bar">
+                        <button class="post-card__action post-card__action--like" 
+                                data-post-id="{{pos.id}}"
+                                data-liked="false">
+                            <i class="fas fa-heart post-card__action-icon"></i>
+                            <span class="post-card__action-text">Like</span>
+                        </button>
+                        
+                        <button class="post-card__action post-card__action--comment">
+                            <i class="fas fa-comment post-card__action-icon"></i>
+                            <span class="post-card__action-text">Comment</span>
+                        </button>
+                        
+                        <button class="post-card__action post-card__action--share">
+                            <i class="fas fa-share-alt post-card__action-icon"></i>
+                            <span class="post-card__action-text">Share</span>
+                        </button>
+                    </div>
+                </footer>
+            </article>
+        
+            {% endfor %}
+            </main>
+    {% else %}
+        <p>You haven't liked any posts yet.</p>
+    {% endif %}
+</div>
+{% endblock %}
