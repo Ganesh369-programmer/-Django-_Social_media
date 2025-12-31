@@ -3,7 +3,7 @@ from django.http import HttpResponse
 
 from django.contrib.auth.models import User
 from django.contrib.auth import login , logout , authenticate  
-from .models import Profile , Post , LikePost , Followers
+from .models import Profile , Post , LikePost , Followers , Comment
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -35,7 +35,7 @@ def home(request):
    
     for p in post:
         try:
-            #this line speacially use for fectch the profile image from db according to the login username
+            #this line speacially use for fectch the profile image from db according to the post owner
             p.profileimg = Profile.objects.get(
                 user__username = p.user
             ).profileimg.url   # this is profile image url that is stored in variable
@@ -72,8 +72,9 @@ def signup(request):
             # Stores user’s ID separately
 
             user_model = User.objects.get(username=fnm)
-            new_profile = Profile.objects.create(user = user_model , id_user=user_model.id)
+            new_profile = Profile.objects.create(user=user_model , id_user=user_model.id)
             new_profile.save()
+            
 
             if my_user is not None:
                 login(request , my_user)
@@ -89,6 +90,7 @@ def loginn(request):
     msg = ""
     if "next" in request.GET:
         msg = "You must be logged in to View that Page."
+
     if request.method == 'POST':
         fnm = request.POST.get('fnm')
         pwd = request.POST.get('pwd')
@@ -108,11 +110,11 @@ def loginn(request):
 @login_required(login_url='/login')
 def upload(request):
     if request.method == 'POST':
-        user = request.user.username 
+        user = request.user.username
         image = request.FILES.get('image-upload')
         caption = request.POST.get('caption')
 
-        new_post = Post.objects.create(user = user , image = image , caption = caption)
+        new_post = Post.objects.create(user=user , image=image , caption=caption)
         new_post.save()
 
         return redirect('/')
@@ -124,20 +126,35 @@ def upload(request):
 def likes(request , id):
     if request.method == 'GET':
         username = request.user.username
-        post = get_object_or_404(Post , id=id )
-        like_filter = LikePost.objects.filter(post_id=id , username=username).first()
+
+        web = request.GET.get('from')
+
+        post = get_object_or_404(Post , id=id)
+
+        like_filter = LikePost.objects.filter(
+            post_id = id , username = username
+        ).first()
+
         if like_filter is None:
-            new_like = LikePost.objects.create(post_id = id , username = username)
+            # This line is use for add like name in LikePost database
+            new_like = LikePost.objects.create(
+                post_id = id , username=username
+            )
+
+            # increase the number of like in Post db
             post.no_of_like = post.no_of_like + 1
-            
         else:
             like_filter.delete()
-            post.no_of_like = post.no_of_like - 1
-            
-        
+            post.no_of_like = post.no_of_like - 1   
+
         post.save()
 
-        return redirect('/#'+id)
+        if web == 'explore':
+            return redirect('/explore')
+        elif web == 'liked_list':
+            return redirect('/liked_list')
+        else:
+            return redirect('/#'+id)
 
 
 
@@ -168,6 +185,10 @@ def explore(request):
     for p in post:
         try:
             p.profileimg = Profile.objects.get(user__username=p.user).profileimg.url
+            # p.profilename = Profile.objects.get(user__username=p.user).user.username
+            p.is_liked = LikePost.objects.filter(
+                post_id=p.id , username = request.user.username
+            ).exists()
         except Profile.DoesNotExist:
             p.profileimg = '/media/blank-profile-picture.png'  # fallback image
 
@@ -181,24 +202,43 @@ def explore(request):
 
 @login_required(login_url='/login')
 def profile(request , id_user):
+    '''
+        #1. Display another person profile 
+        #2.Display own profile and Edit own profile 
+        #3.Manage Follow Unfollow Login
+    '''
+    #this line indicate current user(logged)
     user_object = User.objects.get(username=id_user)
-    profile, created = Profile.objects.get_or_create(user=request.user, defaults={'id_user': request.user.id})
 
+    # (get_or_create) :- this line specially use for either fetch the profile or make new profile
+    # (default = {'id_user' : request.user.id}) :- this line specially use for add new value in "id_user" column , when we create ir
+    profile , created = Profile.objects.get_or_create(user=request.user , defaults={'id_user' : request.user.id})
+    
+    #this line user for find profile information of logged user
     user_profile = Profile.objects.get(user = user_object)
-    user_posts = Post.objects.filter(user = id_user).order_by('-created_at')
-    user_post_length = len(user_posts)
 
+    #this line filter all post of requested user
+    user_posts = Post.objects.filter(user=id_user).order_by('-created_at')
 
+    user_post_length = len(user_posts) # this line tells how many post are uploaded by user 
+
+    # (request.user.username) :- this line indicate the logged in user
     follower = request.user.username
+    print(follower)
+
+    #(id_user);- this line indicate requested user
     user = id_user
+    print(user)
+
 
     if Followers.objects.filter(follower=follower , user=user).first():
         follow_unfollow = 'Unfollow'
     else:
         follow_unfollow = 'Follow'
 
-    user_followers = len(Followers.objects.filter(user = id_user ))
-    user_following = len(Followers.objects.filter(follower = id_user))
+    user_followers = len(Followers.objects.filter(user=id_user))
+    user_following = len(Followers.objects.filter(follower=id_user))
+
 
 
 
@@ -218,7 +258,7 @@ def profile(request , id_user):
             if request.FILES.get('image') == None:
                 image = user_profile.profileimg
                 bio = request.POST['bio']
-                location = request.POST['location']
+                location = request.POST['location'] 
 
                 user_profile.profileimg = image
                 user_profile.bio = bio
@@ -276,18 +316,24 @@ def delete(request, id):
 
 
 def search_result(request):
-    query = request.GET.get('q')
-    users = Profile.objects.filter(user__username__icontains=query)
-    posts = Post.objects.filter(caption__icontains=query)
+    query = request.GET.get('q', '').strip()
 
-    context = {
-        'query' : query,
-        'users' : users,
-        'posts' : posts,
+    users = Profile.objects.filter(
+        user__username__icontains=query
+    ) if query else Profile.objects.none()
 
-    }
+    posts = Post.objects.filter(
+        caption__icontains=query
+    ) if query else Post.objects.none()
+
+    return render(request, 'search_user.html', {
+        'query': query,
+        'users': users,
+        'posts': posts
+    })
+
     
-    return render(request , 'search_user.html' , context)
+    # return render(request , 'search_user.html' , context)
 
 @login_required(login_url='/login')
 def logoutt(request):
@@ -335,3 +381,21 @@ def like_list(request):
     return render(request, 'liked_list.html', {
         'view_like': liked_posts , 'profile' : profile
     })
+
+
+@login_required(login_url='/login')
+def add_comment(request , post_id):
+    if request.method == 'POST':
+        post = get_object_or_404(Post , id=post_id)
+        text = request.POST.get('comment')
+
+        if text.strip():
+            Comment.objects.create(
+                post=post,
+                user=request.user,
+                text=text
+            )
+
+        return redirect('/#' +str(post_id))
+    
+    

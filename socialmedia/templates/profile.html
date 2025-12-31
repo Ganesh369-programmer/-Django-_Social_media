@@ -421,6 +421,7 @@
         <div class="photos-section">
             <h2 class="section-title">Photos</h2>
             
+            {% comment %} Requested user or logged user {% endcomment %}
             {% if user_posts %}
             <div class="photos-grid">
                 {% for pos in user_posts %}

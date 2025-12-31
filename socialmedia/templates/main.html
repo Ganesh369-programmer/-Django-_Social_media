@@ -1188,21 +1188,54 @@
                     </div>
                     
                     <!-- Post Actions -->
-                    <div class="post-card__actions">
-                        <a href="{% url 'like-post' pos.id %} " style="text-decoration: none;" class="post-card__action post-card__action--like {% if pos.is_liked %}post-card__action--active{% endif %}" data-post-id="{{pos.id}}">
-                            <i class="{% if pos.is_liked %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
-                            <span>Like</span>
-                        </a>
+                    <div class="post-card" id="post-{{ pos.id }}">
 
-                        <button class="post-card__action">
-                            <i class="far fa-comment"></i>
-                            <span>Comment</span>
-                        </button>
-                        <button class="post-card__action">
-                            <i class="far fa-share-square"></i>
-                            <span>Share</span>
-                        </button>
+                        <!-- ACTION BUTTONS -->
+                        <div class="post-card__actions">
+
+                            <!-- LIKE -->
+                            <a href="{% url 'like-post' pos.id %}"
+                            class="post-card__action post-card__action--like {% if pos.is_liked %}post-card__action--active{% endif %}" style="text-decoration: none;">
+                                <i class="{% if pos.is_liked %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
+                                <span>Like</span>
+                            </a>
+
+                            <!-- COMMENT BUTTON -->
+                            <button class="post-card__action comment-toggle-btn"
+                                    data-post-id="{{ pos.id }}">
+                                <i class="far fa-comment"></i>
+                                <span>Comment</span>
+                            </button>
+
+                            <!-- SHARE -->
+                            <button class="post-card__action">
+                                <i class="far fa-share-square"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+
+                        <!-- COMMENT SECTION (HIDDEN) -->
+                        <div class="comments-section" id="comments-{{ pos.id }}">
+                            <h4>Comments</h4>
+
+                            {% for comment in pos.comments.all %}
+                                <div class="comment">
+                                    <strong>{{ comment.user.username }}</strong>
+                                    <span>{{ comment.text }}</span>
+                                </div>
+                            {% empty %}
+                                <p class="no-comments">No comments yet</p>
+                            {% endfor %}
+
+                            <form action="{% url 'add-comment' pos.id %}" method="POST">
+                                {% csrf_token %}
+                                <input type="text" name="comment" placeholder="Add a comment..." required>
+                                <button type="submit">Post</button>
+                            </form>
+                        </div>
+
                     </div>
+
                 </div>
             </article>
             {% endfor %}
@@ -1300,6 +1333,31 @@
 </div>
 
 <script>
+    //comment section
+    
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.comments-section').forEach(section => {
+        section.style.display = 'none';
+    });
+});
+
+
+document.querySelectorAll('.comment-toggle-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const postId = this.dataset.postId;
+        const commentSection = document.getElementById('comments-' + postId);
+
+        if (commentSection.style.display === 'block') {
+            commentSection.style.display = 'none';
+        } else {
+            commentSection.style.display = 'block';
+        }
+    });
+});
+
+
+
+
     // Like Button Functionality
     document.querySelectorAll('.post-card__action--like').forEach(button => {
         button.addEventListener('click', function(e) {

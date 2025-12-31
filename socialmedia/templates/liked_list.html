@@ -5,7 +5,8 @@
     
     {% if view_like %}
     <main role="main" class="main-content">
-        <h2>Your Liked Posts</h2>
+         <h1 class="h2 font-bold gradient-text">Your Liked Posts</h1>
+        <h2></h2>
     <div class="container-fluid" id="gridView">
         <div class="explore-grid">
             {% for pos in view_like %}
@@ -47,7 +48,7 @@
                         <div class="post-card__image-overlay"
                             data-bs-toggle="modal"
                             data-bs-target="#fullImageModal"
-                            onclick="setModalImage('{{ pos.image.url }}')">
+                            onclick="setModalImage('{{ pos.image.url }}' , '{{ pos.user }}' )">
 
                             <div class="post-card__overlay-content">
                                 <a href="/profile/{{pos.user}}" class="post-card__overlay-username">
@@ -70,7 +71,7 @@
                     <div class="post-card__stats">
                         <div class="post-card__stat">
                             <i class="fas fa-heart post-card__stat-icon"></i>
-                            <span>{{pos.no_of_likes}}</span>
+                            <span>{{pos.no_of_like}}</span>
                         </div>
                         <div class="post-card__stat">
                             <i class="fas fa-comment post-card__stat-icon"></i>
@@ -79,11 +80,10 @@
                     </div>
                     
                     <div class="post-card__actions-bar">
-                        <button class="post-card__action post-card__action--like" 
-                                data-post-id="{{pos.id}}"
-                                data-liked="false">
-                            <i class="fas fa-heart post-card__action-icon"></i>
-                            <span class="post-card__action-text">Like</span>
+                        <a href="{% url 'like-post' pos.id %}?from=liked_list " style="text-decoration: none;" class="post-card__action post-card__action--like {% if pos.is_liked %}post-card__action--active{% endif %}" data-post-id="{{pos.id}}">
+                            <i class="{% if pos.is_liked %}fas fa-heart{% else %}far fa-heart{% endif %}"></i>
+                            <span>Like</span>
+                        </a>
                         </button>
                         
                         <button class="post-card__action post-card__action--comment">
@@ -100,9 +100,38 @@
             </article>
         
             {% endfor %}
-            </main>
     {% else %}
-        <p>You haven't liked any posts yet.</p>
+        <h1 class="h2 font-bold gradient-text">You haven't liked any posts yet.</h1>   
+        <p></p>
     {% endif %}
+            </main>
+    
 </div>
+
+
+<!-- Modal for full image display -->
+<div class="modal fade" id="fullImageModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                
+                <h5 class="modal-title" id="modalProfileName" style="color:black; font:bold;"></h5>
+                {% comment %} <h5 class="modal-title">{{ pos.user_profile.profilename }}</h5> {% endcomment %}
+                
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 text-center">
+                <img id="modalImage" class="img-fluid w-100 rounded" src="">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  
+function setModalImage(src , profileName) {
+    document.getElementById("modalImage").src = src;
+    document.getElementById("modalProfileName").textContent = profileName;
+}
+</script>
 {% endblock %}

@@ -20,4 +20,6 @@ urlpatterns = [
     path('delete/<str:id>' , views.delete),
     path('search_result/' , views.search_result , name='search_results'),
     path('liked_list/' , views.like_list , name='liked_list'),
+    path('comment/<uuid:post_id>/', views.add_comment, name='add-comment'),
+
 ]
