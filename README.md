@@ -53,10 +53,11 @@ This project was developed to strengthen my **backend development skills**, unde
 ![Profile Page](screenshots/profile.png)
 
 ### 🔍 Search Page
-![Search Page](screenshots/search.png)
+![Search Page1](screenshots/search1.png)
+![Search Page2](screenshots/search2.png)
 
 ### 💬 Comment Section
-![Comments](screenshots/comments.png)
+![Comments](screenshots/comment.png)
 
 
 
